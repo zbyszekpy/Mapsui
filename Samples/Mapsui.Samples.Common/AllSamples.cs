@@ -11,6 +11,7 @@ namespace Mapsui.Samples.Common
             return new Dictionary<string, Func<Map>>
             {
                 ["OpenStreetMap"] = OsmSample.CreateMap,
+                ["Bing maps"] = BingSample.CreateMap,
                 ["Simple Points"] = PointsSample.CreateMap,
                 ["Simple LineStrings"] = LineStringSample.CreateMap,
                 ["Simple Polygons"] = PolygonSample.CreateMap,
@@ -23,11 +24,8 @@ namespace Mapsui.Samples.Common
                 ["Info"] = InfoLayersSample.CreateMap,
                 ["MbTiles"] = MbTilesSample.CreateMap,
                 ["Animated point movement"] = AnimatedPointsSample.CreateMap,
-                ["TileSources: WMTS"] = WmtsSample.CreateMap,
-                ["TileSources: Bing maps"] = BingSample.CreateMap,
-                ["TileSources: TMS"] = TmsSample.CreateMap,
-                // todo: find a WMS-C that is stil in service ["TileSources: WMS-C"] = () => WmscSample.CreateMap(),
-                ["TileSources: regular WMS"] = TiledWmsSample.CreateMap,
+                ["WMTS"] = WmtsSample.CreateMap,
+                ["WMS called tiled"] = TiledWmsSample.CreateMap,
                 ["Rasterizing Layer"] = RasterizingLayerSample.CreateMap,
                 ["Empty Map"] = EmptyMapSample.CreateMap,
                 ["Mutating triangle"] = MutatingTriangleSample.CreateMap,
