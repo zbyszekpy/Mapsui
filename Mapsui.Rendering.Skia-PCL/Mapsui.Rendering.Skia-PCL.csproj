@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ExtensionMethods\ViewportExtensions.cs" />
     <Compile Include="SymbolCache.cs" />
     <Compile Include="BitmapHelper.cs" />
     <Compile Include="ExtensionMethods\SkiaExtensions.cs" />

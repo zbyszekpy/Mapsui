@@ -12,11 +12,8 @@ namespace Mapsui.VectorTiles
     {
         public VectorTileLayer(Func<ITileSource> tileSourceInitializer) : base(tileSourceInitializer) { }
 
-        public VectorTileLayer(ITileSource source = null, int minTiles = 200, int maxTiles = 300, int maxRetries = 2,
-            IFetchStrategy fetchStrategy = null,
-            ITileRenderStrategy tileRenderStrategy = null, int minExtraTiles = -1, int maxExtraTiles = -1) :
-            base(source, minTiles, maxTiles, maxRetries, fetchStrategy, tileRenderStrategy, minExtraTiles,
-                maxExtraTiles)
+        public VectorTileLayer(ITileSource source, IFetchStrategy fetchStrategy, ITileRenderStrategy tileRenderStrategy, int minTiles = 200, int maxTiles = 300, int maxRetries = 2) :
+            base(source, minTiles, maxTiles, maxRetries, fetchStrategy, tileRenderStrategy)
         {
         }
 

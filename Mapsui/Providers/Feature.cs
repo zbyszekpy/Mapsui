@@ -45,6 +45,8 @@ namespace Mapsui.Providers
             get { return _dictionary.Keys; }
         }
 
+        public object Cache { get; set; }
+
         public void Dispose()
         {
             Dispose(true);

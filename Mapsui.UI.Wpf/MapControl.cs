@@ -55,12 +55,13 @@ namespace Mapsui.UI.Wpf
 
         public MapControl()
         {
-            Children.Add(RenderCanvas);
-            Children.Add(RenderElement);
+            Children.Add(WpfTarget);
+            Children.Add(SkiaTarget);
+            RenderMode = RenderMode.Skia;
             Children.Add(_attributionPanel);
             Children.Add(_bboxRect);
 
-            RenderElement.PaintSurface += SKElementOnPaintSurface;
+            SkiaTarget.PaintSurface += SKElementOnPaintSurface;
             CompositionTarget.Rendering += CompositionTargetRendering;
 
             Map = new Map();
@@ -144,9 +145,9 @@ namespace Mapsui.UI.Wpf
 
         public bool ZoomLocked { get; set; }
 
-        public Canvas RenderCanvas { get; } = CreateWpfRenderCanvas();
+        public Canvas WpfTarget { get; } = CreateWpfRenderCanvas();
 
-        private SKElement RenderElement { get; } = CreateSkiaRenderElement();
+        private SKElement SkiaTarget { get; } = CreateSkiaRenderElement();
 
         public RenderMode RenderMode
         {
@@ -155,15 +156,15 @@ namespace Mapsui.UI.Wpf
             {
                 if (value == RenderMode.Skia)
                 {
-                    RenderCanvas.Visibility = Visibility.Collapsed;
-                    RenderElement.Visibility = Visibility.Visible;
+                    WpfTarget.Visibility = Visibility.Collapsed;
+                    SkiaTarget.Visibility = Visibility.Visible;
                     Renderer = new Rendering.Skia.MapRenderer();
                     Refresh();
                 }
                 else
                 {
-                    RenderElement.Visibility = Visibility.Collapsed;
-                    RenderCanvas.Visibility = Visibility.Visible;
+                    SkiaTarget.Visibility = Visibility.Collapsed;
+                    WpfTarget.Visibility = Visibility.Visible;
                     Renderer = new MapRenderer();
                     Refresh();
                 }
@@ -241,7 +242,7 @@ namespace Mapsui.UI.Wpf
 
         public void RefreshData()
         {
-            _map.ViewChanged(true);
+            _map?.ViewChanged(true);
         }
 
         public bool AllowPinchRotation { get; set; }
@@ -520,14 +521,14 @@ namespace Mapsui.UI.Wpf
             if (!_invalid) return; // Don't render when nothing has changed
 
             if (RenderMode == RenderMode.Wpf) RenderWpf();
-            else RenderElement.InvalidateVisual();
+            else SkiaTarget.InvalidateVisual();
         }
 
         private void RenderWpf()
         {
             if (Renderer != null && _map != null)
             {
-                Renderer.Render(RenderCanvas, Map.Viewport, _map.Layers, _map.BackColor);
+                Renderer.Render(WpfTarget, Map.Viewport, _map.Layers, _map.BackColor);
                 _invalid = false;
 
                 if (DeveloperTools.DeveloperMode) FpsCounter.FramePlusOne();}

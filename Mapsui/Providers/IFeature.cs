@@ -11,5 +11,7 @@ namespace Mapsui.Providers
         ICollection<IStyle> Styles { get; }
         object this[string key] { get; set; }
         IEnumerable<string> Fields { get; }
+
+        object Cache { get; set; }
     }
 }

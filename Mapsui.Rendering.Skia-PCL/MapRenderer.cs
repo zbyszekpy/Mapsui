@@ -144,18 +144,19 @@ namespace Mapsui.Rendering.Skia
 
         private void RenderFeature(SKCanvas canvas, IViewport viewport, IStyle style, IFeature feature)
         {
-            if (feature.Geometry is Point)
-                PointRenderer.Draw(canvas, viewport, style, feature, feature.Geometry, _symbolCache);
-            else if (feature.Geometry is MultiPoint)
-                MultiPointRenderer.Draw(canvas, viewport, style, feature, feature.Geometry, _symbolCache);
-            else if (feature.Geometry is LineString)
-                LineStringRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
-            else if (feature.Geometry is MultiLineString)
-                MultiLineStringRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
-            else if (feature.Geometry is Polygon)
+            //if (feature.Geometry is Point)
+            //    PointRenderer.Draw(canvas, viewport, style, feature, feature.Geometry, _symbolCache);
+            //else if (feature.Geometry is MultiPoint)
+            //    MultiPointRenderer.Draw(canvas, viewport, style, feature, feature.Geometry, _symbolCache);
+            //else if (feature.Geometry is LineString)
+            //    LineStringRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
+            //else if (feature.Geometry is MultiLineString)
+            //    MultiLineStringRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
+            //else 
+            if (feature.Geometry is Polygon)
                 PolygonRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
-            else if (feature.Geometry is MultiPolygon)
-                MultiPolygonRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
+            //else if (feature.Geometry is MultiPolygon)
+            //    MultiPolygonRenderer.Draw(canvas, viewport, style, feature, feature.Geometry);
             else if (feature.Geometry is IRaster)
                 RasterRenderer.Draw(canvas, viewport, style, feature, _tileCache, _currentIteration);
         }

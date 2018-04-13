@@ -3,8 +3,10 @@ using System.IO;
 using System.Linq;
 using BruTile.Predefined;
 using BruTile.Web;
+using Mapsui.Fetcher;
 using Mapsui.Geometries;
 using Mapsui.Layers;
+using Mapsui.Rendering;
 using Mapsui.Styles;
 using Mapsui.Styles.Thematics;
 using Mapsui.Utilities;
@@ -20,10 +22,19 @@ namespace Mapsui.Samples.Common.Desktop
             var map = new Map();
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
             // A regular tile layer with a tile source that rasterizes vector tiles
-            map.Layers.Add(new TileLayer(CreateVectorTileTileSource()) { Name = "Rasterized Vector Tiles" });
+            map.Layers.Add(new TileLayer(CreateVectorTileTileSource()) { Name = "Rasterized Vector Tiles", Enabled = false });
             // A vector tile layer that parses the binary tiles returned by the regular tile layer
-            map.Layers.Add(new VectorTileLayer(CreateRegularTileSource()) { Name = " Pure Vector Tiles", Style = new VectorStyle(), Enabled = false });
+            map.Layers.Add(new VectorTileLayer(
+                CreateRegularTileSource(), 
+                tileRenderStrategy: new MinimalTileRenderStrategy(), 
+                fetchStrategy : new MinimalFetchStrategy())
+            {
+                Name = " Pure Vector Tiles",
+                Style = new VectorStyle()
 
+            });
+            map.NavigateTo(map.Resolutions[9]);
+            map.NavigateTo(552792.588558391, 6867866.99142301);
             return map;
         }
 
