@@ -61,10 +61,9 @@ namespace Mapsui.Utilities
                 return null;
 
             if (IsTransformationSupported(transformatiom, fromCRS, toCRS))
-                return transformatiom.Transform(fromCRS, toCRS, extent);
+                return transformatiom.Transform(fromCRS, toCRS, extent.Clone());
 
             return null;
-
         }
 
         private static bool IsProjectionInfoAvailable(ITransformation transformation, string fromCRS, string toCRS)

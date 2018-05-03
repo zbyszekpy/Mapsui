@@ -8,6 +8,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Mapsui.Logging;
 using Mapsui.Samples.Common.Desktop;
+using Mapsui.Samples.Common.Maps.Demo;
 using Mapsui.Samples.Wpf.Utilities;
 using Mapsui.Tests.Common;
 using Mapsui.UI;
@@ -126,7 +127,7 @@ namespace Mapsui.Samples.Wpf
             radioButton.Click += (s, a) =>
             {
                 MapControl.Map.Layers.Clear();
-                MapControl.Map = sample.Value();
+                MapControl.Map = sample.Value(); //WmsSampleForIos.CreateMap();
                 MapControl.Map.Info += MapControlOnInfo;
                 MapControl.Map.Hover += MapControlOnHover;
                 LayerList.Initialize(MapControl.Map.Layers);
@@ -150,7 +151,7 @@ namespace Mapsui.Samples.Wpf
             foreach (var logMessage in copy)
             {
                 if (logMessage == null) continue;
-                result.Append($"{logMessage.LogLevel} {logMessage.Message}{Environment.NewLine}");
+                result.Append($"[{logMessage.LogLevel}] {logMessage.Message}{Environment.NewLine}");
             }
 
             return result.ToString();

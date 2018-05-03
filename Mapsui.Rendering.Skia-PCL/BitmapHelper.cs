@@ -133,6 +133,8 @@ namespace Mapsui.Rendering.Skia
 
         public static void RenderRaster(SKCanvas canvas, SKImage bitmap, SKRect rect, float layerOpacity)
         {
+            if (bitmap == null) return;
+
             if (Math.Abs(layerOpacity - 1) > Utilities.Constants.Epsilon)
             {
                 Paint.Color = new SKColor(255, 255, 255, (byte)(255 * layerOpacity));

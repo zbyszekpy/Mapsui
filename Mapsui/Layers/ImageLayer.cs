@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mapsui.Logging;
 using Mapsui.Utilities;
 
 namespace Mapsui.Layers
@@ -43,6 +42,7 @@ namespace Mapsui.Layers
         private readonly Timer _startFetchTimer;
         private IProvider _dataSource;
         private readonly int _numberOfFeaturesReturned;
+        private BoundingBox _envelope;
 
         /// <summary>
         /// Delay before fetching a new wms image from the server
@@ -56,9 +56,12 @@ namespace Mapsui.Layers
             set
             {
                 if (_dataSource == value) return;
+
                 _dataSource = value;
-                OnPropertyChanged("DataSource");
-                OnPropertyChanged("Envelope");
+                _envelope = ProjectionHelper.GetTransformedBoundingBox(Transformation, DataSource.GetExtents(), DataSource.CRS, CRS);
+
+                OnPropertyChanged(nameof(DataSource));
+                OnPropertyChanged(nameof(Envelope));
             }
         }
 
@@ -66,18 +69,7 @@ namespace Mapsui.Layers
         /// Returns the extent of the layer
         /// </summary>
         /// <returns>Bounding box corresponding to the extent of the features in the layer</returns>
-        public override BoundingBox Envelope
-        {
-            get
-            {
-                if (DataSource == null) return null;
-
-                lock (DataSource)
-                {
-                    return ProjectionHelper.GetTransformedBoundingBox(Transformation, DataSource.GetExtents(), DataSource.CRS, CRS);                   
-                }
-            }
-        }
+        public override BoundingBox Envelope => _envelope;
 
         public ImageLayer(string layername)
         {
@@ -154,8 +146,6 @@ namespace Mapsui.Layers
                     newExtent = Transformation.Transform(CRS, DataSource.CRS, extent);
                 
             var fetcher = new FeatureFetcher(newExtent, resolution, DataSource, DataArrived, DateTime.Now.Ticks);
-
-            Logger.Log(LogLevel.Debug, $"Starting new fetch at {DateTime.Now.TimeOfDay}");
 
             Task.Run(() => fetcher.FetchOnThread());
         }

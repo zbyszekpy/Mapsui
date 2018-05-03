@@ -1,7 +1,9 @@
+using System;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using System.Collections.Generic;
 using System.Linq;
+using Mapsui.Logging;
 using Mapsui.Styles;
 
 namespace Mapsui.Fetcher
@@ -30,7 +32,9 @@ namespace Mapsui.Fetcher
         {
             lock (_provider)
             {
+                Logger.Log(LogLevel.Debug, $"Start fetching at {DateTime.Now.TimeOfDay}");
                 var features = _provider.GetFeaturesInView(_extent, _resolution).ToList();
+                Logger.Log(LogLevel.Debug, $"Finished fetching at {DateTime.Now.TimeOfDay}");
                 _dataArrived?.Invoke(features, _timeOfRequest);
             }
         }
