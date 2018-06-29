@@ -13,7 +13,11 @@ namespace Mapsui.Samples.Common.Maps
         {
             var map = new Map();
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
-            map.Layers.Add(CreateLayer());
+            var polygonLayer = CreateLayer();
+            map.Layers.Add(polygonLayer);
+            var level = 0; // With level set at 15 there is no problem.
+            map.Viewport.Resolution = map.Resolutions[level];
+            map.Viewport.Center = polygonLayer.Envelope.GetCentroid();
             return map;
         }
 
