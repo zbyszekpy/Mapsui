@@ -14,7 +14,7 @@ namespace Mapsui.Rendering.Skia
 
             foreach (var polygon in multiPolygon)
             {
-                PolygonRenderer.Draw(canvas, viewport, style, feature, polygon, opacity, symbolCache);
+                PolygonRenderer.Draw(canvas, viewport, polygon);
             }
         }
     }
