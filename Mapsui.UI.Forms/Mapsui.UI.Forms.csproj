@@ -26,11 +26,11 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
-    <PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.1.1" />
     <PackageReference Include="Xamarin.Forms" Version="4.3.0.991221" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SkiaSharp\source\SkiaSharp.Views.Forms\SkiaSharp.Views.Forms\SkiaSharp.Views.Forms.csproj" />
     <ProjectReference Include="..\Mapsui.Geometries\Mapsui.Geometries.csproj" />
     <ProjectReference Include="..\Mapsui.Rendering.Skia\Mapsui.Rendering.Skia.csproj" />
     <ProjectReference Include="..\Mapsui\Mapsui.csproj" />
