@@ -19,21 +19,21 @@ namespace Mapsui.UI.Forms
         {
             public long Id { get; }
             public Geometries.Point Location { get; }
-            public long Tick { get; }
+            public DateTime PressTime { get; }
 
-            public TouchEvent(long id, Geometries.Point screenPosition, long tick)
+            public TouchEvent(long id, Geometries.Point screenPosition, DateTime pressTime)
             {
                 Id = id;
                 Location = screenPosition;
-                Tick = tick;
+                PressTime = pressTime;
             }
         }
 
         // See http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.0.4_r2.1/android/view/ViewConfiguration.java#ViewConfiguration.0PRESSED_STATE_DURATION for values
         private const int shortTap = 125;
-        private const int shortClick = 250;
+        private static readonly TimeSpan shortClickSpan = TimeSpan.FromMilliseconds(250);
         private const int delayTap = 200;
-        private const int longTap = 500;
+        private static readonly TimeSpan longTapSpan = TimeSpan.FromMilliseconds(500);
 
         /// <summary>
         /// If a finger touches down and up it counts as a tap if the distance between the down and up location is smaller
@@ -46,7 +46,7 @@ namespace Mapsui.UI.Forms
         private float _skiaScale;
         private double _innerRotation;
         private Dictionary<long, TouchEvent> _touches = new Dictionary<long, TouchEvent>();
-        private Geometries.Point _firstTouch;
+        private TouchEvent _firstTouch;
         private System.Threading.Timer _doubleTapTestTimer;
         private int _numOfTaps = 0;
         private FlingTracker _velocityTracker = new FlingTracker();
@@ -108,15 +108,12 @@ namespace Mapsui.UI.Forms
         private void OnTouch(object sender, SKTouchEventArgs e)
         {
             // Save time, when the event occures
-            long ticks = DateTime.Now.Ticks;
-
+            var eventTime = DateTime.Now;
             var location = GetScreenPosition(e.Location);
 
             if (e.ActionType == SKTouchAction.Pressed)
             {
-                _firstTouch = location;
-
-                _touches[e.Id] = new TouchEvent(e.Id, location, ticks);
+                _touches[e.Id] = _firstTouch = new TouchEvent(e.Id, location, eventTime); ;
 
                 _velocityTracker.Clear();
 
@@ -145,7 +142,7 @@ namespace Mapsui.UI.Forms
                     double velocityX;
                     double velocityY;
 
-                    (velocityX, velocityY) = _velocityTracker.CalcVelocity(e.Id, ticks);
+                    (velocityX, velocityY) = _velocityTracker.CalcVelocity(e.Id, eventTime.Ticks);
 
                     if (Math.Abs(velocityX) > 200 || Math.Abs(velocityY) > 200)
                     {
@@ -164,11 +161,14 @@ namespace Mapsui.UI.Forms
                     // (especially on Samsung). So check, if touch start location isn't more 
                     // than a number of pixels away from touch end location.
 
-                    var isAround = Algorithms.Distance(releasedTouch.Location, _firstTouch) < touchSlop;
+                    var distance = Algorithms.Distance(releasedTouch.Location, this._firstTouch.Location);
+                    var isAround = distance < touchSlop * PixelDensity;
+
+                    var pressSpan = eventTime - this._firstTouch.PressTime;
 
                     // If touch start and end is in the same area and the touch time is shorter
                     // than longTap, than we have a tap.
-                    if (isAround && (ticks - releasedTouch.Tick) < (e.DeviceType == SKTouchDeviceType.Mouse ? shortClick : longTap) * 10000)
+                    if (isAround && pressSpan < (e.DeviceType == SKTouchDeviceType.Mouse ? shortClickSpan : longTapSpan))
                     {
                         // Start a timer with timeout delayTap ms. If than isn't arrived another tap, than it is a single
                         _doubleTapTestTimer = new System.Threading.Timer((l) =>
@@ -189,7 +189,7 @@ namespace Mapsui.UI.Forms
                             _doubleTapTestTimer = null;
                         }, location, UseDoubleTap ? delayTap : 0, -1);
                     }
-                    else if (isAround && (ticks - releasedTouch.Tick) >= longTap * 10000)
+                    else if (isAround && pressSpan >= longTapSpan)
                     {
                         if (!e.Handled)
                             e.Handled = OnLongTapped(location);
@@ -208,10 +208,10 @@ namespace Mapsui.UI.Forms
             }
             if (e.ActionType == SKTouchAction.Moved)
             {
-                _touches[e.Id] = new TouchEvent(e.Id, location, ticks);
+                _touches[e.Id] = new TouchEvent(e.Id, location, eventTime);
 
                 if (e.InContact)
-                    _velocityTracker.AddEvent(e.Id, location, ticks);
+                    _velocityTracker.AddEvent(e.Id, location, eventTime.Ticks);
 
                 if (e.InContact && !e.Handled)
                     e.Handled = OnTouchMove(_touches.Select(t => t.Value.Location).ToList());
