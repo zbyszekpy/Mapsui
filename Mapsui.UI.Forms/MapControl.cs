@@ -48,6 +48,7 @@ namespace Mapsui.UI.Forms
         private Dictionary<long, TouchEvent> _touches = new Dictionary<long, TouchEvent>();
         private TouchEvent _firstTouch;
         private System.Threading.Timer _doubleTapTestTimer;
+        private System.Threading.Timer _longTapTestTimer;
         private int _numOfTaps = 0;
         private FlingTracker _velocityTracker = new FlingTracker();
         private Geometries.Point _previousCenter;
@@ -117,6 +118,25 @@ namespace Mapsui.UI.Forms
 
                 _velocityTracker.Clear();
 
+                this._longTapTestTimer?.Dispose();
+                _longTapTestTimer = new System.Threading.Timer((id) =>
+                {
+                  if (_touches.Count == 1 && _touches.TryGetValue((long)id, out var touchEvent))
+                  {
+                    var distance = Algorithms.Distance(touchEvent.Location, this._firstTouch.Location);
+                    var isAround = distance < touchSlop * PixelDensity;
+
+                    if (isAround)
+                    {
+                      OnLongTapped(location);
+                    }
+                  }
+
+                  this._longTapTestTimer?.Dispose();
+                  _longTapTestTimer = null;
+
+                }, e.Id, longTapSpan, TimeSpan.Zero);
+
                 // Do we have a doubleTapTestTimer running?
                 // If yes, stop it and increment _numOfTaps
                 if (_doubleTapTestTimer != null)
@@ -135,6 +155,9 @@ namespace Mapsui.UI.Forms
                 // Delete e.Id from _touches, because finger is released
                 var releasedTouch = _touches[e.Id];
                 _touches.Remove(e.Id);
+
+                this._longTapTestTimer?.Dispose();
+                _longTapTestTimer = null;
 
                 // Is this a fling or swipe?
                 if (_touches.Count == 0)
@@ -178,8 +201,7 @@ namespace Mapsui.UI.Forms
                                 if (!e.Handled)
                                     e.Handled = OnDoubleTapped(location, _numOfTaps);
                             }
-                            else
-                                if (!e.Handled)
+                            else if (!e.Handled)
                                 e.Handled = OnSingleTapped((Geometries.Point)l);
                             _numOfTaps = 1;
                             if (_doubleTapTestTimer != null)
@@ -188,11 +210,6 @@ namespace Mapsui.UI.Forms
                             }
                             _doubleTapTestTimer = null;
                         }, location, UseDoubleTap ? delayTap : 0, -1);
-                    }
-                    else if (isAround && pressSpan >= longTapSpan)
-                    {
-                        if (!e.Handled)
-                            e.Handled = OnLongTapped(location);
                     }
                 }
 
